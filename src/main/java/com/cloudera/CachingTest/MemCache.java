@@ -22,17 +22,21 @@ public class MemCache implements CacheService {
 		memcached.set(object.getKey() + "-l", 3600, object.getLastName());
 		memcached.set(object.getKey() + "-a", 3600, object.getAge());
 		memcached.set(object.getKey() + "-e", 3600, object.getEmail());
+		memcached.set(object.getKey() + "-p", 3600, object.getPassword());
 		return true;
 	}
 
-	public CachedObject get(String firstName, String lastName)
+	public CachedObject get(String email)
 			throws NoSuchAlgorithmException, UnsupportedEncodingException {
-		CachedObject tmpObject = new Person(firstName, lastName, 0, null);
-		String f = memcached.get(tmpObject.getKey() + "-f").toString();
-		String l = memcached.get(tmpObject.getKey() + "-l").toString();
-		int a = Integer.parseInt(memcached.get(tmpObject.getKey() + "-a").toString());
-		String e = memcached.get(tmpObject.getKey() + "-e").toString();
-		return new Person(f, l, a, e);
+		String key = Person.getKey(email);
+		String f = memcached.get(key + "-f").toString();
+		String l = memcached.get(key + "-l").toString();
+		int a = Integer.parseInt(memcached.get(key + "-a").toString());
+		String e = memcached.get(key + "-e").toString();
+		String p = memcached.get(key + "-p").toString();
+		CachedObject obj = new Person(f, l, a, e);
+		obj.setHashedPassword(p);
+		return obj;
 	}
 
 }
